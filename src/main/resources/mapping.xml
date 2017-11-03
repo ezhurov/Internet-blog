@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+	<mapping>
+		<class-a>com.example.course.entities.Posts</class-a>
+		<class-b>com.example.course.beans.PostsBean</class-b>
+		<field>
+			<a>id</a>
+			<b>id</b>
+		</field>
+		<field>
+			<a>theme</a>
+			<b>theme</b>
+		</field>
+		<field>
+			<a>post</a>
+			<b>post</b>
+		</field>
+		<field>
+			<a>datatime</a>
+			<b>datatime</b>
+		</field>
+		<field>
+			<a>users.username</a>
+			<b>userName</b>
+		</field>
+		<field custom-converter="com.example.course.dozer.ListSizeConverter">
+			<a>likespost</a>
+			<b>likes</b>
+		</field>
+	</mapping>
+	
+	<mapping>
+		<class-a>com.example.course.entities.Comments</class-a>
+		<class-b>com.example.course.beans.CommentsBean</class-b>
+		<field>
+			<a>id</a>
+			<b>id</b>
+		</field>
+		<field>
+			<a>comment</a>
+			<b>comment</b>
+		</field>
+		<field>
+			<a>datatime</a>
+			<b>datatime</b>
+		</field>
+		<field>
+			<a>users.username</a>
+			<b>userName</b>
+		</field>
+		<field>
+			<a>posts.post</a>
+			<b>post</b>
+		</field>
+	</mapping>
+
+</mappings> 

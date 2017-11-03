@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd"
+
+	default-lazy-init="true">
+
+	<context:annotation-config />
+	<context:component-scan base-package="com.example.course" />
+
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/course?characterEncoding=utf8" />
+		<property name="username" value="root" />
+		<property name="password" value="root" />
+	</bean>
+
+	<bean name="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan" value="com.example.course.entities" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</prop>
+				<prop key="hibernate.connection.pool_size">10</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.connection.CharSet">utf8</prop>
+		        <prop key="hibernate.connection.characterEncoding">utf8</prop>
+		        <prop key="hibernate.connection.useUnicode">true</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+	
+	<tx:annotation-driven />
+
+	<mvc:resources mapping="/js/**" location="/js/" />
+
+	<mvc:annotation-driven />
+	
+	<security:global-method-security secured-annotations="enabled" />
+
+	<security:http auto-config="true" use-expressions="false">
+		<security:form-login login-page="/authorization.html"
+							authentication-failure-url="/authorization.html?error=true"
+							default-target-url="/index.html" /> 
+			
+		<security:logout logout-url="/logout" logout-success-url="/authorization.html"/>
+		
+		<security:remember-me remember-me-parameter="remember-me" 
+							remember-me-cookie="remember-me" />
+							
+		<security:csrf disabled="true" />						
+	</security:http>
+	
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:jdbc-user-service data-source-ref="dataSource"
+						users-by-username-query="SELECT username, password, enabled FROM users WHERE username=?"
+						authorities-by-username-query="SELECT username, role FROM users WHERE username=?" />
+		</security:authentication-provider>
+	</security:authentication-manager>
+	
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="local/messages" />
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+	
+	<mvc:interceptors>
+		<bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+			<property name="paramName" value="lang" />
+		</bean>
+	</mvc:interceptors>
+	
+	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+		<property name="defaultLocale" value="ru" />
+	</bean>
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="1000000" />
+	</bean>
+	
+	<bean id="mapper" class="org.dozer.DozerBeanMapper">
+		<property name="mappingFiles">
+			<list>
+				<value>mapping.xml</value>
+			</list>
+		</property>
+	</bean>
+
+</beans>
